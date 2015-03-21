@@ -1,8 +1,10 @@
 package waw.decision.maker;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import waw.decision.maker.data.LoadDecissionDB;
 import waw.decision.maker.model.LoanApplication;
+import waw.decision.maker.model.LoanApplicationReport;
 import waw.decision.maker.model.LoanDecission;
 
 /**
@@ -41,22 +43,22 @@ public class DecisionMakerController {
                 loanStatus = MANUAL;
         }
         LoanApplicationReport report = new LoanApplicationReport(loanApplication, loanStatus, loanApplicationId);
-        reports.put(loanApplicationId, report);
-        serviceRestClient.forService("reporting-service")
-                .post()
-                .withCircuitBreaker(
-                        HystrixCommand.Setter.withGroupKey(() -> "group").andCommandKey(() -> "command"),
-                        new Closure(this) {
-                            @Override
-                            public void run() {
-                                LOG.info("BREAKING DA CIRCUIT!");
-                            }
-                        })
-
-                .onUrl("/api/reporting")
-                .body(report)
-        .withHeaders()
-                .contentTypeJson();
+//        reports.put(loanApplicationId, report);
+//        serviceRestClient.forService("reporting-service")
+//                .post()
+//                .withCircuitBreaker(
+//                        HystrixCommand.Setter.withGroupKey(() -> "group").andCommandKey(() -> "command"),
+//                        new Closure(this) {
+//                            @Override
+//                            public void run() {
+//                                LOG.info("BREAKING DA CIRCUIT!");
+//                            }
+//                        })
+//
+//                .onUrl("/api/reporting")
+//                .body(report)
+//        .withHeaders()
+//                .contentTypeJson();
 
     }
 
@@ -65,7 +67,7 @@ public class DecisionMakerController {
 
         LoanDecission loanDecission = loadDecissionDB.selectSingle(loanApplicationId);
 
-        return loanApplication;
+        return loanDecission;
 
     }
 
