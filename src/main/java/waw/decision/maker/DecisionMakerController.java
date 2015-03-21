@@ -43,7 +43,7 @@ public class DecisionMakerController {
     }
 
     @RequestMapping(value = "/api/loanApplication/{loanApplicationId}", method = RequestMethod.GET)
-    public LoanDecission getLoanApplication(@PathVariable String loanApplicationId){
+    public LoanDecission getLoanDecission(@PathVariable String loanApplicationId){
 
         LoanDecission loanApplication = new LoanDecission();
         loanApplication.setApplicationId(loanApplicationId);
