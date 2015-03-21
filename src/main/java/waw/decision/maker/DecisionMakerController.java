@@ -39,4 +39,15 @@ public class DecisionMakerController {
         //insert to db
         //call report
     }
+
+    @RequestMapping(value = "/api/loanApplication/{loanApplicationId}", method = RequestMethod.GET)
+    public LoanDecission getLoanApplication(@PathVariable String loanApplicationId){
+
+        LoanDecission loanApplication = new LoanDecission();
+        loanApplication.setApplicationId(loanApplicationId);
+
+        return loanApplication;
+
+    }
+
 }
