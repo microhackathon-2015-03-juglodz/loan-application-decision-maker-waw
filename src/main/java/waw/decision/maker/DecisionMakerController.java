@@ -1,13 +1,19 @@
 package waw.decision.maker;
 
+import com.ofg.infrastructure.web.resttemplate.fluent.ServiceRestClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import waw.decision.maker.model.LoanApplication;
+import waw.decision.maker.model.LoanApplicationReport;
 
 /**
  * Created by kwalczak on 21.03.15.
  */
 @RestController
 public class DecisionMakerController {
+
+    @Autowired
+    ServiceRestClient serviceRestClient;
 
     private static final String FRAUD = "fraud";
     private static final String GOOD = "good";
@@ -36,12 +42,17 @@ public class DecisionMakerController {
             default:
                 loanStatus = MANUAL;
         }
-        //insert to db
-        //call report
+        LoanApplicationReport report = new LoanApplicationReport(loanApplication, loanStatus, loanApplicationId);
+        serviceRestClient.forService("reporting-service")
+                .post()
+                .onUrl("/api/reporting")
+                .body(report)
+        .withHeaders()
+                .contentTypeJson();
     }
 
     @RequestMapping(value = "/api/loanApplication/{loanApplicationId}", method = RequestMethod.GET)
-    public LoanDecission getLoanDecission(@PathVariable String loanApplicationId){
+    public LoanDecission getLoanApplication(@PathVariable String loanApplicationId){
 
         LoanDecission loanApplication = new LoanDecission();
         loanApplication.setApplicationId(loanApplicationId);
