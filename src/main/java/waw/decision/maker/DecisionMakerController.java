@@ -1,8 +1,5 @@
 package waw.decision.maker;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import waw.decision.maker.data.LoadDecissionDB;
