@@ -1,10 +1,11 @@
 {
-    "waw": {
-        "this": "com/ofg/loan-application-decision-maker-waw",
-        "dependencies": {
-            "collerator": {
-                "path": "com/ofg/some-other-service"
-            }
-        }
+  "waw": {
+    "this": "com/ofg/loan-application-decision-maker-waw",
+    "dependencies": {
+      "collerator": {
+        "path": "com/ofg/reporting-service-waw",
+        "path": "com/ofg/marketing-offer-generator-waw"
+      }
     }
+  }
 }

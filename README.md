@@ -44,7 +44,7 @@ Please check [run.sh](scripts/run.sh) or [run.bat](scripts/run.bat) script.
 
 ### From IntelliJ IDEA
 
-Run Application class with the following VM args:
+Run waw.decision.maker.Application class with the following VM args:
 -DAPP_ENV="prod" -DCONFIG_FOLDER="properties" -DENCRYPT_KEY="secretEncryptKey" -Dspring.profiles.active=dev
 
 For details check runner script.
@@ -107,7 +107,7 @@ Your microservice (assuming it exposes 8080 port) will be visible outside under 
 
 Below you can find description of the most crucial parts of the application's production code.
 
-##### Application 
+##### waw.decision.maker.Application
 
 contains Spring Boot autoconfiguration and contains *main* method
 
@@ -240,7 +240,7 @@ Inside you will find [bower](http://bower.io/) for javascript dependency managem
 
 Before first use, build your whole application with `gradle build`. It will download auto-magically all npms and bower dependencies.
 
-Then run you application (for example from Idea, just run main in `com.ofg.twitter.Application` specifying
+Then run you application (for example from Idea, just run main in `com.ofg.twitter.waw.decision.maker.Application` specifying
 the correct -Dspring.profiles.active).
 
 Now your application (backend) works. But you still need js+html. And since this is 2014, you don't just write html anymore, you have to use a shitload of libs :)
