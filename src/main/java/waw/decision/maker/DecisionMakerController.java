@@ -1,7 +1,13 @@
 package waw.decision.maker;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import waw.decision.maker.data.LoadDecissionDB;
 import waw.decision.maker.model.LoanApplication;
+import waw.decision.maker.model.LoanDecission;
 
 /**
  * Created by kwalczak on 21.03.15.
@@ -17,6 +23,8 @@ public class DecisionMakerController {
     private static final String MANUAL = "manual";
     private static final String SUCCESS = "success";
 
+    @Autowired
+    private LoadDecissionDB loadDecissionDB;
 
     @RequestMapping("/test")
     public String greeting() {
@@ -43,10 +51,9 @@ public class DecisionMakerController {
     @RequestMapping(value = "/api/loanApplication/{loanApplicationId}", method = RequestMethod.GET)
     public LoanDecission getLoanDecission(@PathVariable String loanApplicationId){
 
-        LoanDecission loanApplication = new LoanDecission();
-        loanApplication.setApplicationId(loanApplicationId);
+        LoanDecission loanDecission = loadDecissionDB.selectSingle(loanApplicationId);
 
-        return loanApplication;
+        return loanDecission;
 
     }
 
