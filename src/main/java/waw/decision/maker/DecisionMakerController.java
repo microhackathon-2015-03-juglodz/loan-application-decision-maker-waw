@@ -1,11 +1,17 @@
 package waw.decision.maker;
 
+import com.netflix.hystrix.HystrixCommand;
+import com.ofg.infrastructure.web.resttemplate.fluent.ServiceRestClient;
+import groovy.lang.Closure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import waw.decision.maker.data.LoadDecissionDB;
 import waw.decision.maker.model.LoanApplication;
 import waw.decision.maker.model.LoanApplicationReport;
 import waw.decision.maker.model.LoanDecission;
+import waw.decision.maker.model.MarketingOffer;
 
 /**
  * Created by kwalczak on 21.03.15.
@@ -24,10 +30,12 @@ public class DecisionMakerController {
     @Autowired
     private LoadDecissionDB loadDecissionDB;
 
-    @RequestMapping("/test")
-    public String greeting() {
-        return "working";
-    }
+    @Autowired
+    ServiceRestClient serviceRestClient;
+
+
+    private static final Logger LOG = LoggerFactory.getLogger(DecisionMakerController.class);
+
 
     @RequestMapping(value = "/api/loanApplication/{loanApplicationId}", method = RequestMethod.PUT)
     public void decide(@PathVariable String loanApplicationId, @RequestBody LoanApplication loanApplication) {
@@ -35,38 +43,56 @@ public class DecisionMakerController {
         switch (loanApplication.getFraudStatus()) {
             case FRAUD:
                 loanStatus = FAILURE;
+                break;
             case GOOD:
                 loanStatus = SUCCESS;
+                break;
             case FISHY:
                 loanStatus = MANUAL;
+                break;
             default:
                 loanStatus = MANUAL;
         }
         LoanApplicationReport report = new LoanApplicationReport(loanApplication, loanStatus, loanApplicationId);
-//        reports.put(loanApplicationId, report);
-//        serviceRestClient.forService("reporting-service")
-//                .post()
-//                .withCircuitBreaker(
-//                        HystrixCommand.Setter.withGroupKey(() -> "group").andCommandKey(() -> "command"),
-//                        new Closure(this) {
-//                            @Override
-//                            public void run() {
-//                                LOG.info("BREAKING DA CIRCUIT!");
-//                            }
-//                        })
-//
-//                .onUrl("/api/reporting")
-//                .body(report)
-//        .withHeaders()
-//                .contentTypeJson();
+        LoanDecission loanDecission = new LoanDecission(loanApplicationId, "", loanStatus);
+        loadDecissionDB.insert(loanDecission);
+        serviceRestClient.forService("reporting-service")
+                .put()
+                .withCircuitBreaker(
+                        HystrixCommand.Setter.withGroupKey(() -> "group").andCommandKey(() -> "command"),
+                        new Closure(this) {
+                            @Override
+                            public void run() {
+                                LOG.info("BREAKING DA CIRCUIT!");
+                            }
+                        })
 
+                .onUrl("/api/reporting")
+                .body(report)
+                .withHeaders()
+                .contentTypeJson();
+        MarketingOffer offer = new MarketingOffer(loanApplication, loanStatus);
+
+        serviceRestClient.forService("marketing-offer-generator")
+                .put()
+                .withCircuitBreaker(
+                        HystrixCommand.Setter.withGroupKey(() -> "group").andCommandKey(() -> "command"),
+                        new Closure(this) {
+                            @Override
+                            public void run() {
+                                LOG.info("BREAKING DA CIRCUIT!");
+                            }
+                        })
+
+                .onUrl("/api/marketing/" + loanApplicationId)
+                .body(offer)
+                .withHeaders()
+                .contentTypeJson();
     }
 
     @RequestMapping(value = "/api/loanApplication/{loanApplicationId}", method = RequestMethod.GET)
-    public LoanDecission getLoanDecission(@PathVariable String loanApplicationId){
-
+    public LoanDecission getLoanDecission(@PathVariable String loanApplicationId) {
         LoanDecission loanDecission = loadDecissionDB.selectSingle(loanApplicationId);
-
         return loanDecission;
 
     }
