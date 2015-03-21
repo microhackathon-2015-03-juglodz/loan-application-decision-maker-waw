@@ -1,5 +1,8 @@
 package waw.decision.maker.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by kwalczak on 21.03.15.
  */
@@ -58,5 +61,12 @@ public class LoanApplicationReport {
 
     public void setDecision(String decision) {
         this.decision = decision;
+    }
+
+    public Map<String, String> toMap(){
+        Map<String, String> map = new HashMap<>();
+        map.put("loanId", loanId);
+        map.put("fraudStatus", fraudStatus);
+        return map;
     }
 }
