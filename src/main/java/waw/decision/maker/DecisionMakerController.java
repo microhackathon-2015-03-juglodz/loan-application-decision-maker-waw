@@ -35,9 +35,7 @@ public class DecisionMakerController {
                 loanStatus = MANUAL;
             default:
                 loanStatus = MANUAL;
-
         }
-        //decide
         //insert to db
         //call report
     }
